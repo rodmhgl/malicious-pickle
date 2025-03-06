@@ -1,0 +1,34 @@
+[
+  {
+    "title": "What is a Malicious Pickle?",
+    "content": "A \"malicious pickle\" refers to a Python pickle file containing harmful code. Pickle is Python's serialization format, but it can execute arbitrary code during deserialization. The first known malicious pickle was discovered in January 2022, which used Python's exec function to run a Cobalt Strike stager shellcode through Windows APIs."
+  },
+  {
+    "title": "Why is Pickle Deserialization Dangerous?",
+    "content": "Python's pickle module uses a protocol that allows execution of arbitrary code during unpickling. When deserializing pickle data, Python essentially executes instructions in the pickle, which can include malicious code designed to compromise systems. Security best practice is to never unpickle data from untrusted sources."
+  },
+  {
+    "title": "How Does a Malicious Pickle Work?",
+    "content": "Malicious pickles typically leverage Python's __reduce__ method, which tells Python how to reconstruct an object. Attackers can craft this method to execute arbitrary code, including malware. The first malicious pickle used Python's exec function to invoke the ctypes library and run shellcode through Windows APIs like VirtualAlloc and CreateThread."
+  },
+  {
+    "title": "Alternative Serialization Options",
+    "content": "For safer serialization in Python, consider alternatives like JSON, YAML, or Protocol Buffers. If you must use pickle, libraries like 'restrictedsession' or 'dill' with custom Unpicklers can add some safety measures, but no solution is perfectly secure against all pickle-based attacks."
+  },
+  {
+    "title": "Detecting Malicious Pickles",
+    "content": "Security tools can scan serialized data for suspicious patterns, like the presence of dangerous modules (os, sys, subprocess), dangerous functions (exec, eval), or specific bytecode sequences that indicate malicious intent. Static and dynamic analysis can both help identify potentially harmful pickle files."
+  },
+  {
+    "title": "Pickle Protocol Versions",
+    "content": "Python's pickle module has evolved through multiple protocol versions (0-5). The malicious pickle discovered in 2022 used protocol version 3, which offers binary encoding and better performance than earlier text-based versions. Newer versions introduce more features but don't address the fundamental security issues."
+  },
+  {
+    "title": "Supply Chain Implications",
+    "content": "Malicious pickles highlight the importance of supply chain security. Packages that use pickle for data serialization, configuration, or model storage can become attack vectors. Always verify the source of pickle files and scan them before unpickling, especially in machine learning workflows."
+  },
+  {
+    "title": "Mitigating Pickle Risks",
+    "content": "To protect against pickle-based attacks: never unpickle data from untrusted sources, implement allowlists for classes that can be deserialized, use restricted execution environments when possible, and consider message authentication codes (MACs) to verify the integrity of your pickle data."
+  }
+]
