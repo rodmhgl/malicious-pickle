@@ -109,8 +109,12 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(data => {
         blurbs = data;
-        // Cache the blurbs data
-        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        // Cache the blurbs data with quota handling
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.warn('Storage quota exceeded, caching disabled');
+        }
         // Set a random blurb once the data is loaded
         setRandomBlurb();
       })
@@ -186,9 +190,16 @@ document.addEventListener('DOMContentLoaded', function () {
   
   // Display terminal messages with a typing effect but optimized for performance
   let currentMessageIndex = 0;
+  let animationFrameId = null;
+  let lastFrameTime = 0;
+  const FRAME_DELAY = 300; // Time in ms between frames
 
-  function displayNextTerminalMessage() {
-    if (currentMessageIndex < terminalMessages.length) {
+  function displayNextTerminalMessage(timestamp) {
+    if (!lastFrameTime) lastFrameTime = timestamp;
+    
+    const elapsed = timestamp - lastFrameTime;
+    
+    if (elapsed >= FRAME_DELAY && currentMessageIndex < terminalMessages.length) {
       // Create but don't append the line yet
       const line = document.createElement('div');
       line.className = 'terminal-line';
@@ -218,11 +229,13 @@ document.addEventListener('DOMContentLoaded', function () {
       renderVisibleTerminalLines();
       
       currentMessageIndex++;
-
-      // Use consistent delay for better performance
-      const delay = 300;
-      setTimeout(displayNextTerminalMessage, delay);
-    } else {
+      lastFrameTime = timestamp;
+    }
+    
+    if (currentMessageIndex < terminalMessages.length) {
+      // Continue animation if there are more messages
+      animationFrameId = requestAnimationFrame(displayNextTerminalMessage);
+    } else if (currentMessageIndex === terminalMessages.length) {
       // Add blinking cursor at the end
       const lastLine = document.createElement('div');
       lastLine.className = 'terminal-line';
@@ -239,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
       
       terminalLines.push(lastLine);
       renderVisibleTerminalLines();
+      currentMessageIndex++; // Increment to prevent repeated cursor additions
     }
   }
   
@@ -258,6 +272,15 @@ document.addEventListener('DOMContentLoaded', function () {
     terminalContent.scrollTop = terminalContent.scrollHeight;
   }
 
-  // Start displaying terminal messages after a short delay
-  setTimeout(displayNextTerminalMessage, 1000);
+  // Start displaying terminal messages after a short delay using requestAnimationFrame
+  setTimeout(() => {
+    animationFrameId = requestAnimationFrame(displayNextTerminalMessage);
+  }, 1000);
+  
+  // Clean up animation frame on page unload
+  window.addEventListener('unload', () => {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
+  });
 });
