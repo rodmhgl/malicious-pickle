@@ -1,70 +1,105 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // List of image filenames
-  const images = [
-    // 'malicious-pickle.png',
-    // 'malicious-pickle2.png',
-    // 'malicious-pickle3.png',
-    // 'malicious-pickle4.png',
-    // 'malicious-pickle5.png',
-    // 'malicious-pickle6.png',
-    // 'malicious-pickle7.png',
-    // 'malicious-pickle8.png',
-    // 'malicious-pickle9.png',
-    // 'malicious-pickle10.png',
-    // 'malicious-pickle11.png',
-    // 'malicious-pickle12.png',
-    // 'malicious-pickle13.png',
-    'malicious-pickle14.png',
-    'malicious-pickle15.png',
-    'malicious-pickle16.png',
-    'malicious-pickle17.png',
-    'malicious-pickle18.png',
-    'malicious-pickle19.png',
-    'malicious-pickle20.png',
-    'malicious-pickle21.png',
-    'malicious-pickle22.png'
-  ];
+  // Image configuration
+  const imageConfig = {
+    // Available image numbers
+    imageNumbers: [14, 15, 16, 17, 18, 19, 20, 21, 22],
+    // Base filename without extension and number
+    baseFilename: 'malicious-pickle',
+    // Image formats priority (first supported format will be used)
+    formats: [
+      { type: 'webp', path: 'images/webp/' },
+      { type: 'png', path: 'images/' }
+    ]
+  };
 
   let blurbs = [];
-  const imgElement = document.getElementById('random-image');
+  const imgContainer = document.querySelector('.image-container');
+
+  // Check if browser supports WebP
+  const supportsWebP = (function() {
+    const canvas = document.createElement('canvas');
+    if (canvas.getContext && canvas.getContext('2d')) {
+      // It's supported, now check WebP support
+      return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+    }
+    return false;
+  })();
 
   // Preload images to ensure they're in browser cache
   function preloadImages() {
-    images.forEach(imageSrc => {
+    // Determine best format for this browser
+    const formatToUse = supportsWebP ? imageConfig.formats[0] : imageConfig.formats[1];
+    
+    imageConfig.imageNumbers.forEach(num => {
       const img = new Image();
-      img.src = 'images/' + imageSrc;
+      img.src = `${formatToUse.path}${imageConfig.baseFilename}${num}.${formatToUse.type}`;
     });
   }
 
   // Start preloading images immediately
   preloadImages();
 
+  // Create picture element with sources for WebP and fallback
+  function createPictureElement(imageNumber) {
+    // Cleanup previous content
+    imgContainer.innerHTML = '';
+    
+    // Create picture element
+    const picture = document.createElement('picture');
+    
+    // Add WebP source
+    const webpSource = document.createElement('source');
+    webpSource.srcset = `images/webp/${imageConfig.baseFilename}${imageNumber}.webp`;
+    webpSource.type = 'image/webp';
+    picture.appendChild(webpSource);
+    
+    // Add PNG fallback source
+    const pngSource = document.createElement('source');
+    pngSource.srcset = `images/${imageConfig.baseFilename}${imageNumber}.png`;
+    pngSource.type = 'image/png';
+    picture.appendChild(pngSource);
+    
+    // Add img element
+    const img = document.createElement('img');
+    img.id = 'random-image';
+    img.alt = 'Visual representation of Python pickle security vulnerability';
+    img.loading = 'lazy';
+    img.src = `images/${imageConfig.baseFilename}${imageNumber}.png`;
+    
+    // Add error handling
+    img.onerror = function() {
+      console.error('Error loading image:', img.src);
+      img.alt = 'Image failed to load';
+      // Try loading a different image
+      setTimeout(() => {
+        setRandomImage();
+      }, 500);
+    };
+    
+    picture.appendChild(img);
+    imgContainer.appendChild(picture);
+    
+    return img;
+  }
+
   // Function to set a random image
   function setRandomImage() {
-    const randomImage = images[Math.floor(Math.random() * images.length)];
-    imgElement.src = 'images/' + randomImage;
+    const randomIndex = Math.floor(Math.random() * imageConfig.imageNumbers.length);
+    const randomImageNumber = imageConfig.imageNumbers[randomIndex];
+    
+    // Create and return the picture element with all sources
+    return createPictureElement(randomImageNumber);
   }
 
   // Set initial random image regardless of blurbs load outcome
   setRandomImage();
 
-  // Attach onload and onerror handlers
-  imgElement.onload = function () {
-    console.log('Image loaded successfully:', imgElement.src);
-  };
-
-  imgElement.onerror = function () {
-    console.error('Error loading image:', imgElement.src);
-    imgElement.alt = 'Image failed to load';
-    // Try reloading the image with a cache-busting parameter
-    setTimeout(() => {
-      imgElement.src = imgElement.src.split('?')[0] + '?t=' + new Date().getTime();
-    }, 500);
-  };
+  // Image loading handled within createPictureElement
 
   // Function to show random image and blurb
   function showRandomContent() {
-    setRandomImage();
+    const img = setRandomImage();
+    
     if (blurbs.length > 0) {
       const randomBlurb = blurbs[Math.floor(Math.random() * blurbs.length)];
       document.getElementById('blurb-title').textContent = randomBlurb.title;
