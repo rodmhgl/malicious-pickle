@@ -72,29 +72,61 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Load blurbs from external JSON file
-  fetch('blurbs.json')
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to load blurbs.json');
-      }
-      return response.json();
-    })
-    .then(data => {
-      blurbs = data;
-      // Set a random blurb once the data is loaded
+  // Cache key for blurbs data
+  const CACHE_KEY = 'pickle-blurbs';
+  
+  // Function to set a random blurb
+  function setRandomBlurb() {
+    if (blurbs.length > 0) {
       const randomBlurb = blurbs[Math.floor(Math.random() * blurbs.length)];
       document.getElementById('blurb-title').textContent = randomBlurb.title;
       document.getElementById('blurb-content').textContent = randomBlurb.content;
-    })
-    .catch(error => {
-      console.error('Error loading blurbs:', error);
-      // Fallback blurb in case loading fails
-      document.getElementById('blurb-title').textContent = 'What is a Malicious Pickle?';
-      document.getElementById('blurb-content').textContent =
-        'A "malicious pickle" refers to a Python pickle file containing harmful code. ' +
-        'Pickle is Python\'s serialization format, but it can execute arbitrary code during deserialization.';
-    });
+    }
+  }
+  
+  // Check for cached blurbs before fetching
+  const cachedBlurbs = localStorage.getItem(CACHE_KEY);
+  if (cachedBlurbs) {
+    try {
+      blurbs = JSON.parse(cachedBlurbs);
+      setRandomBlurb();
+    } catch (e) {
+      // If cached data is corrupt, fetch from server
+      fetchBlurbs();
+    }
+  } else {
+    fetchBlurbs();
+  }
+  
+  // Load blurbs from external JSON file
+  function fetchBlurbs() {
+    fetch('blurbs.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to load blurbs.json');
+        }
+        return response.json();
+      })
+      .then(data => {
+        blurbs = data;
+        // Cache the blurbs data with quota handling
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        } catch (e) {
+          console.warn('Storage quota exceeded, caching disabled');
+        }
+        // Set a random blurb once the data is loaded
+        setRandomBlurb();
+      })
+      .catch(error => {
+        console.error('Error loading blurbs:', error);
+        // Fallback blurb in case loading fails
+        document.getElementById('blurb-title').textContent = 'What is a Malicious Pickle?';
+        document.getElementById('blurb-content').textContent =
+          'A "malicious pickle" refers to a Python pickle file containing harmful code. ' +
+          'Pickle is Python\'s serialization format, but it can execute arbitrary code during deserialization.';
+      });
+  }
 
   // Set up button click handler
   document.getElementById('new-pickle-btn').addEventListener('click', showRandomContent);
@@ -153,18 +185,57 @@ document.addEventListener('DOMContentLoaded', function () {
     terminalContent.scrollTop = terminalContent.scrollHeight;
   }
 
-  // Display terminal messages with a typing effect
+  // Terminal lines container to optimize DOM updates
+  const terminalLines = [];
+  
+  // Display terminal messages with a typing effect but optimized for performance
   let currentMessageIndex = 0;
+  let animationFrameId = null;
+  let lastFrameTime = 0;
+  const FRAME_DELAY = 300; // Time in ms between frames
 
-  function displayNextTerminalMessage() {
-    if (currentMessageIndex < terminalMessages.length) {
-      addTerminalLine(terminalMessages[currentMessageIndex]);
+  function displayNextTerminalMessage(timestamp) {
+    if (!lastFrameTime) lastFrameTime = timestamp;
+    
+    const elapsed = timestamp - lastFrameTime;
+    
+    if (elapsed >= FRAME_DELAY && currentMessageIndex < terminalMessages.length) {
+      // Create but don't append the line yet
+      const line = document.createElement('div');
+      line.className = 'terminal-line';
+
+      if (terminalMessages[currentMessageIndex].startsWith('>>>') || 
+          terminalMessages[currentMessageIndex].startsWith('...')) {
+        const prompt = document.createElement('span');
+        prompt.className = 'terminal-prompt';
+        prompt.textContent = terminalMessages[currentMessageIndex].substring(0, 4);
+
+        const content = document.createElement('span');
+        content.textContent = terminalMessages[currentMessageIndex].substring(4);
+
+        line.appendChild(prompt);
+        line.appendChild(content);
+      } else if (terminalMessages[currentMessageIndex].startsWith('ERROR:')) {
+        line.style.color = '#ff5f56';
+        line.textContent = terminalMessages[currentMessageIndex];
+      } else {
+        line.textContent = terminalMessages[currentMessageIndex];
+      }
+      
+      // Store the line in our array
+      terminalLines.push(line);
+      
+      // Batch update the DOM with all lines at once
+      renderVisibleTerminalLines();
+      
       currentMessageIndex++;
-
-      // Random delay between messages for realistic typing feel
-      const delay = Math.random() * 1000 + 500;
-      setTimeout(displayNextTerminalMessage, delay);
-    } else {
+      lastFrameTime = timestamp;
+    }
+    
+    if (currentMessageIndex < terminalMessages.length) {
+      // Continue animation if there are more messages
+      animationFrameId = requestAnimationFrame(displayNextTerminalMessage);
+    } else if (currentMessageIndex === terminalMessages.length) {
       // Add blinking cursor at the end
       const lastLine = document.createElement('div');
       lastLine.className = 'terminal-line';
@@ -178,10 +249,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
       lastLine.appendChild(prompt);
       lastLine.appendChild(cursor);
-      terminalContent.appendChild(lastLine);
+      
+      terminalLines.push(lastLine);
+      renderVisibleTerminalLines();
+      currentMessageIndex++; // Increment to prevent repeated cursor additions
     }
   }
+  
+  // Render only the visible terminal lines for better performance
+  function renderVisibleTerminalLines() {
+    // Clear current content
+    terminalContent.innerHTML = '';
+    
+    // Only render the most recent lines that would be visible
+    const visibleLines = terminalLines.slice(-15); // Adjust based on likely visible area
+    
+    // Create a document fragment for batch DOM update
+    const fragment = document.createDocumentFragment();
+    visibleLines.forEach(line => fragment.appendChild(line.cloneNode(true)));
+    
+    terminalContent.appendChild(fragment);
+    terminalContent.scrollTop = terminalContent.scrollHeight;
+  }
 
-  // Start displaying terminal messages after a short delay
-  setTimeout(displayNextTerminalMessage, 1000);
+  // Start displaying terminal messages after a short delay using requestAnimationFrame
+  setTimeout(() => {
+    animationFrameId = requestAnimationFrame(displayNextTerminalMessage);
+  }, 1000);
+  
+  // Clean up animation frame on page unload
+  window.addEventListener('unload', () => {
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId);
+    }
+  });
 });
