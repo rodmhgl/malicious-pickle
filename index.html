@@ -13,10 +13,10 @@
   <title>Malicious Pickle Gallery</title>
   
   <!-- Resource hints for improved performance -->
-  <link rel="preload" href="styles.css" as="style">
-  <link rel="preload" href="main.js" as="script">
-  <link rel="preload" href="blurbs.json" as="fetch" crossorigin>
-  <link rel="preload" href="images/malicious-pickle18.png" as="image">
+  <link rel="preload" href="styles.css" as="style" fetchpriority="high">
+  <link rel="preload" href="main.js" as="script" fetchpriority="high">
+  <link rel="preload" href="blurbs.json" as="fetch" crossorigin fetchpriority="high">
+  <link rel="preload" href="images/malicious-pickle18.png" as="image" fetchpriority="high">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
   <!-- Favicons -->
@@ -33,7 +33,7 @@
   <div class="container">
     <div class="upper-content">
       <div class="image-container">
-        <img id="random-image" alt="Malicious Pickle" loading="lazy" width="500" height="400">
+        <img id="random-image" alt="Malicious Pickle" loading="lazy">
       </div>
 
       <div class="info-section">

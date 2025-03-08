@@ -45,6 +45,9 @@ html {
   border-radius: 8px;
   box-shadow: 0 0 25px rgba(50, 50, 50, 0.3);
   object-fit: contain;
+  min-height: 400px; /* Ensure minimum size while maintaining aspect ratio */
+  width: auto;
+  height: auto;
 }
 
 .info-section {
