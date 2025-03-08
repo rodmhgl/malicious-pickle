@@ -6,6 +6,35 @@ html {
   color: #ffffff;
   font-family: monospace;
   overflow: hidden;
+  line-height: 1.6;
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #2dbd6e;
+  color: #000;
+  padding: 8px;
+  z-index: 100;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* For screen readers only */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
 }
 
 .container {
@@ -17,6 +46,49 @@ html {
   text-align: center;
   padding: 1vh 2vw;
   box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  width: 100%;
+  padding: 1rem 0;
+}
+
+header h1 {
+  margin: 0 0 0.5rem;
+  color: #2dbd6e;
+  font-size: 2rem;
+}
+
+header .tagline {
+  margin: 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+main {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+footer {
+  width: 100%;
+  padding: 1rem 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+footer a {
+  color: #2dbd6e;
+  text-decoration: none;
+}
+
+footer a:hover, 
+footer a:focus {
+  text-decoration: underline;
 }
 
 .upper-content {
