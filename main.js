@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // Update year in footer copyright
+  document.getElementById('current-year').textContent = new Date().getFullYear();
   // List of image filenames
   const images = [
     // 'malicious-pickle.png',
