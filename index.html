@@ -4,13 +4,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Explore the Malicious Pickle Gallery, where we illustrate the risks of Python pickle deserialization and offer insights into securing your code.">
-  <meta property="og:title" content="Malicious Pickle Gallery">
-  <meta property="og:description" content="Learn about the dangers of malicious pickle files and how to secure your Python applications.">
-  <meta property="og:image" content="images/malicious-pickle18.png">
+  
+  <!-- Primary SEO Meta Tags -->
+  <title>Malicious Pickle - Python Pickle Security Risks & Mitigations</title>
+  <meta name="description" content="Learn about Python pickle security vulnerabilities, deserialization attacks, and how to protect your applications from malicious pickle exploits.">
+  <meta name="keywords" content="python pickle security, deserialization attacks, python security, malicious pickle, pickle vulnerability, secure deserialization">
+  <meta name="author" content="Malicious Pickle Team">
+  <link rel="canonical" href="https://malicious-pickle.com/">
+  
+  <!-- Open Graph / Facebook Meta Tags -->
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://malicious-pickle.com/">
+  <meta property="og:title" content="Malicious Pickle - Python Pickle Security Risks/Mitigations">
+  <meta property="og:description" content="Learn about Python pickle security vulnerabilities, deserialization attacks, and how to protect your applications from malicious pickle exploits.">
+  <meta property="og:image" content="https://malicious-pickle.com/resized_social.png">
+  <meta property="og:image:alt" content="Python pickle security visualization">
+  
+  <!-- Twitter Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://malicious-pickle.com/">
+  <meta name="twitter:title" content="Malicious Pickle - Python Security Education">
+  <meta name="twitter:description" content="Learn about Python pickle security vulnerabilities, deserialization attacks, and how to protect your applications.">
+  <meta name="twitter:image" content="https://malicious-pickle.com/resized_social.png">
+  <meta name="twitter:image:alt" content="Python pickle security visualization">
+  
+  <!-- Technical SEO -->
   <meta http-equiv="Accept-CH" content="DPR, Width, Viewport-Width">
-  <title>Malicious Pickle Gallery</title>
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#2dbd6e">
   
   <!-- Resource hints for improved performance -->
   <link rel="preload" href="styles.css" as="style" fetchpriority="high">
@@ -31,47 +52,90 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="upper-content">
-      <div class="image-container">
-        <img id="random-image" alt="Malicious Pickle" loading="lazy">
-      </div>
+  <!-- Skip links for accessibility -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
 
-      <div class="info-section">
-        <div class="info-box">
-          <div class="blurb-title" id="blurb-title">What is a Malicious Pickle?</div>
-          <div class="blurb-content" id="blurb-content">
-            A "malicious pickle" refers to a Python pickle file containing harmful code. Pickle is Python's
-            serialization
-            format, but it can execute arbitrary code during deserialization. The first known malicious pickle was
-            discovered in January 2022, which used Python's exec function to run a Cobalt Strike stager shellcode
-            through
-            Windows APIs.
+  <div class="container">
+    <header>
+      <h1>Malicious Pickle</h1>
+      <p class="tagline">Understanding Python Pickle Security Risks</p>
+    </header>
+
+    <main id="main-content">
+      <div class="upper-content">
+        <div class="image-container">
+          <img id="random-image" alt="Visual representation of Python pickle security vulnerability" loading="lazy">
+        </div>
+
+        <div class="info-section">
+          <article class="info-box">
+            <h2 class="blurb-title" id="blurb-title">What is a Malicious Pickle?</h2>
+            <div class="blurb-content" id="blurb-content">
+              A "malicious pickle" refers to a Python pickle file containing harmful code. Pickle is Python's
+              serialization
+              format, but it can execute arbitrary code during deserialization. The first known malicious pickle was
+              discovered in January 2022, which used Python's exec function to run a Cobalt Strike stager shellcode
+              through
+              Windows APIs.
+            </div>
+          </article>
+          <div class="controls">
+            <button id="new-pickle-btn" aria-label="Load another security example">Get Another Pickle</button>
           </div>
         </div>
-        <div class="controls">
-          <button id="new-pickle-btn">Get Another Pickle</button>
-        </div>
       </div>
-    </div>
 
-    <!-- Terminal Console -->
-    <div class="terminal-container">
-      <div class="terminal-header">
-        <div>pickle_security.py</div>
-        <div class="terminal-controls">
-          <div class="terminal-button" style="background-color: #ff5f56;"></div>
-          <div class="terminal-button" style="background-color: #ffbd2e;"></div>
-          <div class="terminal-button" style="background-color: #27c93f;"></div>
+      <!-- Terminal Console -->
+      <section class="terminal-section">
+        <h2 class="visually-hidden">Interactive Code Example</h2>
+        <div class="terminal-container">
+          <div class="terminal-header">
+            <div>pickle_security.py</div>
+            <div class="terminal-controls">
+              <div class="terminal-button" style="background-color: #ff5f56;"></div>
+              <div class="terminal-button" style="background-color: #ffbd2e;"></div>
+              <div class="terminal-button" style="background-color: #27c93f;"></div>
+            </div>
+          </div>
+          <div class="terminal-content" id="terminal-content" aria-live="polite">
+            <!-- Terminal messages will be added here dynamically -->
+          </div>
         </div>
-      </div>
-      <div class="terminal-content" id="terminal-content">
-        <!-- Terminal messages will be added here dynamically -->
-      </div>
-    </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; <span id="current-year">2023</span> Malicious Pickle - Educational Security Resource</p>
+      <p>Learn more about <a href="https://docs.python.org/3/library/pickle.html">Python Pickle</a> | <a href="https://owasp.org/www-community/vulnerabilities/Deserialization_of_untrusted_data">OWASP Deserialization</a></p>
+    </footer>
   </div>
 
   <script src="main.js" defer></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Malicious Pickle",
+    "description": "Learn about Python pickle security vulnerabilities, deserialization attacks, and how to protect your applications.",
+    "educationalLevel": "Advanced",
+    "keywords": "Python security, pickle, deserialization, code execution, vulnerability",
+    "learningResourceType": "Interactive Resource",
+    "about": {
+      "@type": "Thing",
+      "name": "Computer Security"
+    },
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "Software Developers"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "Malicious Pickle Team"
+    },
+    "inLanguage": "en",
+    "isAccessibleForFree": true
+  }
+  </script>
 </body>
 
 </html>

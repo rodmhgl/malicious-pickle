@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // Update year in footer copyright
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+  
   // Image configuration
   const imageConfig = {
     // Available image numbers
