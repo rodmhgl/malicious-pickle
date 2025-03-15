@@ -46,6 +46,11 @@ document.addEventListener('DOMContentLoaded', function () {
     
     // Create picture element
     const picture = document.createElement('picture');
+    picture.style.display = 'flex';
+    picture.style.justifyContent = 'center';
+    picture.style.alignItems = 'center';
+    picture.style.maxWidth = '100%';
+    picture.style.height = '100%';
     
     // Add WebP source
     const webpSource = document.createElement('source');

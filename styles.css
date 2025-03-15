@@ -5,11 +5,11 @@ html {
   background-color: #000000;
   color: #ffffff;
   font-family: monospace;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -45,7 +45,6 @@ html {
   border-radius: 8px;
   box-shadow: 0 0 25px rgba(50, 50, 50, 0.3);
   object-fit: contain;
-  min-height: 400px; /* Ensure minimum size while maintaining aspect ratio */
   width: auto;
   height: auto;
 }
@@ -194,10 +193,18 @@ button:hover {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+  .container {
+    height: auto;
+    overflow-y: auto;
+    padding: 10px;
+  }
+  
   .upper-content {
     flex-direction: column;
     height: auto;
-    max-height: 65vh;
+    max-height: none;
+    margin-bottom: 15px;
+    gap: 15px;
   }
 
   .image-container,
@@ -205,22 +212,30 @@ button:hover {
     width: 100%;
     max-width: 100%;
     height: auto;
+    min-height: 0;
   }
 
   .image-container {
-    max-height: 35vh;
+    max-height: 40vh;
+  }
+  
+  #random-image {
+    min-height: auto;
+    max-height: 40vh;
   }
 
   .info-section {
-    max-height: 28vh;
+    max-height: none;
   }
 
   .info-box {
-    max-height: 100%;
+    max-height: none;
+    margin-bottom: 10px;
   }
 
   .terminal-container {
-    height: 28vh;
+    height: 30vh;
+    margin-top: 10px;
   }
 }
 
